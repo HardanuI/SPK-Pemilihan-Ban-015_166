@@ -10,7 +10,7 @@ from saw import load_data, run_saw
 from charts import chart_ranking, chart_harga_pie_top5, chart_scatter_top5
 from styles import CSS
 
-# Konfigurasi halaman 
+# ─── Konfigurasi halaman ────────
 st.set_page_config(
     page_title="SPK Ban — SAW",
     page_icon="🚗",
@@ -19,14 +19,14 @@ st.set_page_config(
 )
 st.markdown(CSS, unsafe_allow_html=True)
 
-# Load data
+# ─── Load data ────────
 @st.cache_data
 def get_data():
     return load_data('Car_Tyres_Dataset_Clean.csv')
 
 df_all = get_data()
 
-# Sidebar 
+# ─── Sidebar ─────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("""
     <div class="sidebar-logo">
@@ -36,7 +36,7 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    # Bobot Kriteria
+    # ── Bobot Kriteria ───────────────────────────────────────────────────────
     st.markdown("### ⚖️ Bobot Kriteria")
     st.caption("Total bobot harus = 1.00")
 
@@ -57,10 +57,10 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # Pencarian Ban 
+    # ── Pencarian Ban ────────────────────────────────────────────────────────
     st.markdown("### 🔍 Pencarian Ban")
 
-    # Filter Ukuran Ban 
+    # Filter 1: Ukuran Ban (dari kolom Size asli)
     all_sizes  = sorted(df_all['Size'].dropna().unique().tolist())
     pilih_size = st.selectbox(
         "📐 Ukuran Ban",
@@ -69,7 +69,7 @@ with st.sidebar:
         key="filter_size"
     )
 
-    # Filter Merk Ban
+    # Filter 2: Merk Ban
     all_brands  = sorted(df_all['TyreBrand'].dropna().unique().tolist())
     pilih_brand = st.selectbox(
         "🏷️ Merk Ban",
@@ -78,6 +78,7 @@ with st.sidebar:
         key="filter_brand"
     )
 
+    # Terapkan filter
     df_filtered = df_all.copy()
     if pilih_size != "Semua Ukuran":
         df_filtered = df_filtered[df_filtered['Size'] == pilih_size]
@@ -90,7 +91,7 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # Filter Tampilan 
+    # ── Filter Tampilan ──────────────────────────────────────────────────────
     st.markdown("### 🔢 Filter Tampilan")
     top_n = st.selectbox("Tampilkan Top-N Ban", [5, 10, 15, 20, 30, 50], index=1)
 
@@ -103,7 +104,7 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-# Hero banner 
+# ─── Hero banner ──────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero-banner">
     <div class="hero-badge">🚗 Sistem Pendukung Keputusan</div>
@@ -112,7 +113,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Metric cards 
+# ─── Metric cards ─────────────────────────────────────────────────────────────
 n_alternatif = len(df_filtered)
 n_total      = len(df_all)
 n_kriteria   = len(CRITERIA)
@@ -138,7 +139,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# Tabs
+# ─── Tabs ─────────────────────────────────────────────────────────────────────
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📋 Dataset",
     "⚙️ Proses SAW",
@@ -147,7 +148,9 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "👥 Profil Kelompok",
 ])
 
-# ====== TAB 1 — DATASET =====
+# ════════════════════════════════════════════════════════
+# TAB 1 — DATASET
+# ════════════════════════════════════════════════════════
 with tab1:
     st.markdown('<h2 class="section-header">📋 Dataset Ban Mobil</h2>', unsafe_allow_html=True)
     st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
@@ -181,7 +184,9 @@ with tab1:
         use_container_width=True,
     )
 
-# ===== TAB 2 — PROSES SAW =====
+# ════════════════════════════════════════════════════════
+# TAB 2 — PROSES SAW
+# ════════════════════════════════════════════════════════
 with tab2:
     st.markdown('<h2 class="section-header">⚙️ Proses Perhitungan SAW</h2>', unsafe_allow_html=True)
     st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
@@ -226,7 +231,7 @@ with tab2:
             st.session_state['df_grouped'] = df_grouped
             st.session_state['df_norm']    = df_norm
 
-            # Matriks Keputusan
+            # Step 1 — Matriks Keputusan
             st.markdown("""
             <div class="step-row">
                 <span class="step-badge">1</span>
@@ -241,7 +246,7 @@ with tab2:
                 use_container_width=True, height=280
             )
 
-            # Normalisasi
+            # Step 2 — Normalisasi
             st.markdown("""
             <div class="step-row">
                 <span class="step-badge">2</span>
@@ -255,7 +260,7 @@ with tab2:
             norm_show = df_norm[[ALTERNATIVE_COL] + CRITERIA].rename(columns=CRITERIA_LABEL)
             st.dataframe(norm_show.round(4), use_container_width=True, height=280)
 
-            # Nilai Preferensi
+            # Step 3 — Nilai Preferensi
             st.markdown("""
             <div class="step-row">
                 <span class="step-badge">3</span>
@@ -293,7 +298,9 @@ with tab2:
         else:
             st.info("👈 Sesuaikan bobot di sidebar, lalu klik **Jalankan Perhitungan SAW**.")
 
-# ===== TAB 3  HASIL PERANGKINGAN ======
+# ════════════════════════════════════════════════════════
+# TAB 3 — HASIL PERANGKINGAN
+# ════════════════════════════════════════════════════════
 with tab3:
     st.markdown('<h2 class="section-header">🏆 Hasil Perangkingan Ban</h2>', unsafe_allow_html=True)
     st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
@@ -333,7 +340,9 @@ with tab3:
             height=460,
         )
 
-# ======= TAB 4 VISUALISASI =====
+# ════════════════════════════════════════════════════════
+# TAB 4 — VISUALISASI
+# ════════════════════════════════════════════════════════
 with tab4:
     st.markdown('<h2 class="section-header">📊 Visualisasi Analitik</h2>', unsafe_allow_html=True)
     st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
@@ -350,7 +359,9 @@ with tab4:
         st.pyplot(chart_harga_pie_top5(df_ranked, df_grouped))
         st.pyplot(chart_scatter_top5(df_ranked, df_grouped))
 
-# ===== TAB 5  PROFIL KELOMPOK ======
+# ════════════════════════════════════════════════════════
+# TAB 5 — PROFIL KELOMPOK
+# ════════════════════════════════════════════════════════
 with tab5:
     st.markdown('<h2 class="section-header">👥 Profil Kelompok</h2>', unsafe_allow_html=True)
     st.markdown('<hr class="section-divider">', unsafe_allow_html=True)

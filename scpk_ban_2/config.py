@@ -1,3 +1,5 @@
+# config.py — Konstanta global untuk SPK Pemilihan Ban Terbaik
+
 CRITERIA = [
     'SellingPrice',
     'OriginalPrice',
@@ -14,6 +16,8 @@ CRITERIA_LABEL = {
     'VelgSize':      '🔧 Ukuran Velg (R)',
 }
 
+# benefit = semakin tinggi semakin baik
+# cost    = semakin rendah semakin baik
 ATTRIBUTE_TYPES = {
     'SellingPrice':  'cost',
     'OriginalPrice': 'cost',
